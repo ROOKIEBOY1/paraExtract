@@ -1,0 +1,16 @@
+.venv/
+.paddlenlp/
+models/
+__pycache__/
+.pytest_cache/
+*.pyc
+.DS_Store
+.coverage
+htmlcov/
+*.log
+
+# Generated experiment artifacts can contain machine-specific paths.
+results/*
+!results/environment.md
+!results/strict_mode_assessment.md
+!results/strict_mode_evaluation.json

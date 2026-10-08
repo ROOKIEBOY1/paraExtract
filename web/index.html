@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PP-UIE Pocket 参数提取</title>
+  <style>
+    :root { color-scheme: light; --ink:#172033; --muted:#667085; --line:#d8deea; --brand:#3157d5; --soft:#f3f6fc; --ok:#0b8f55; }
+    * { box-sizing: border-box; }
+    body { margin:0; color:var(--ink); background:linear-gradient(145deg,#edf3ff 0,#f8fafc 40%,#eef8f4 100%); font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    main { width:min(1180px,calc(100% - 32px)); margin:32px auto 60px; }
+    header { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:22px; }
+    h1 { margin:0; font-size:clamp(24px,4vw,38px); letter-spacing:-.03em; }
+    .subtitle { color:var(--muted); margin:6px 0 0; }
+    .model-control { display:flex; align-items:center; gap:9px; flex-wrap:wrap; justify-content:flex-end; }
+    .model-control select { width:auto; min-width:150px; height:40px; }
+    .status { padding:9px 14px; border:1px solid #b8dccb; border-radius:999px; background:#effbf5; color:#087647; white-space:nowrap; }
+    .status::before { content:""; display:inline-block; width:8px; height:8px; margin-right:8px; border-radius:50%; background:var(--ok); }
+    .grid { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(360px,.95fr); gap:18px; }
+    .card { background:rgba(255,255,255,.9); border:1px solid rgba(210,218,232,.9); border-radius:18px; padding:22px; box-shadow:0 18px 50px rgba(49,70,110,.08); backdrop-filter:blur(12px); }
+    h2 { margin:0 0 16px; font-size:18px; }
+    label.title { display:block; margin:14px 0 7px; font-weight:650; }
+    select, textarea { width:100%; border:1px solid var(--line); border-radius:11px; background:#fff; color:var(--ink); font:inherit; }
+    select { height:44px; padding:0 12px; }
+    textarea { min-height:330px; padding:13px; resize:vertical; line-height:1.65; }
+    select:focus, textarea:focus { outline:3px solid rgba(49,87,213,.13); border-color:var(--brand); }
+    .group { margin:16px 0 0; }
+    .group-name { color:var(--muted); font-size:13px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+    .checks { display:flex; flex-wrap:wrap; gap:8px; margin-top:9px; }
+    .chip input { position:absolute; opacity:0; pointer-events:none; }
+    .chip span { display:block; padding:7px 11px; border:1px solid var(--line); border-radius:999px; background:#fff; cursor:pointer; user-select:none; transition:.15s ease; }
+    .chip input:checked + span { color:#fff; border-color:var(--brand); background:var(--brand); box-shadow:0 4px 12px rgba(49,87,213,.22); }
+    .field-actions { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:18px; color:var(--muted); }
+    .strict-toggle { display:flex; align-items:flex-start; gap:9px; margin-top:16px; padding:12px; border:1px solid #cbd6f5; border-radius:11px; background:#f5f7ff; }
+    .strict-toggle input { margin-top:4px; accent-color:var(--brand); }
+    .strict-toggle small { display:block; color:var(--muted); }
+    .links button { border:0; background:none; color:var(--brand); cursor:pointer; padding:4px 7px; }
+    #extract-button { width:100%; height:48px; margin-top:18px; border:0; border-radius:12px; color:#fff; background:linear-gradient(120deg,#3157d5,#5b71df); font:700 16px/1 inherit; cursor:pointer; box-shadow:0 10px 24px rgba(49,87,213,.24); }
+    #extract-button:disabled { cursor:wait; opacity:.65; }
+    .metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:0 0 16px; }
+    .metric { padding:13px; border-radius:12px; background:var(--soft); }
+    .metric b { display:block; font-size:18px; }
+    .metric span { color:var(--muted); font-size:12px; }
+    .result-title { display:flex; align-items:center; justify-content:space-between; margin-top:16px; }
+    pre { min-height:160px; max-height:360px; overflow:auto; margin:8px 0 0; padding:15px; border-radius:12px; background:#101828; color:#d9e2f2; white-space:pre-wrap; word-break:break-word; font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .placeholder { color:var(--muted); padding:60px 10px; text-align:center; }
+    .error { color:#b42318; background:#fff1f0; border:1px solid #f6c7c3; border-radius:10px; padding:10px; margin-top:12px; }
+    @media (max-width:860px) { header { align-items:flex-start; flex-direction:column; } .grid { grid-template-columns:1fr; } textarea { min-height:240px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div><h1>Pocket 参数提取</h1><p class="subtitle">选择文本与字段，使用已驻留内存的 PP-UIE 模型进行动态 Schema 抽取。</p></div>
+    <div class="model-control"><label for="model-select">模型</label><select id="model-select" disabled></select><div class="status" id="model-status">正在连接模型…</div></div>
+  </header>
+  <div class="grid">
+    <section class="card">
+      <h2>1. 选择输入文本</h2>
+      <label class="title" for="sample-select">测试文本</label>
+      <select id="sample-select"><option>正在载入…</option></select>
+      <label class="title" for="input-text">文本内容（可直接编辑）</label>
+      <textarea id="input-text" placeholder="在这里粘贴 Pocket 参数帖子…"></textarea>
+    </section>
+    <section class="card">
+      <h2>2. 选择提取字段</h2>
+      <div id="field-list"></div>
+      <div class="field-actions">
+        <span id="field-count">已选 0 项</span>
+        <div class="links"><button id="select-camera" type="button">全选</button><button id="clear-fields" type="button">清空</button></div>
+      </div>
+      <label class="strict-toggle"><input id="strict-mode" type="checkbox" checked><span><strong>严格抽取模式</strong><small>只接受原文中有证据且类型合法的值，并显示被拒绝的候选。</small></span></label>
+      <button id="extract-button" type="button">开始提取</button>
+      <div id="error-box"></div>
+    </section>
+    <section class="card" style="grid-column:1/-1">
+      <h2>3. 提取结果</h2>
+      <div id="result-placeholder" class="placeholder">模型已加载后，点击“开始提取”查看结果。</div>
+      <div id="result-content" hidden>
+        <div class="metrics">
+          <div class="metric"><b id="elapsed">—</b><span>总耗时</span></div>
+          <div class="metric"><b id="inference-time">—</b><span>模型推理</span></div>
+          <div class="metric"><b id="schema-time">—</b><span>Schema 设置</span></div>
+        </div>
+        <div class="result-title"><strong>标准化结果</strong><span id="result-model"></span></div>
+        <pre id="normalized-output"></pre>
+        <div class="result-title"><strong>通过校验的值与原文证据</strong></div>
+        <pre id="verified-output"></pre>
+        <div class="result-title"><strong>被拒绝的候选及原因</strong></div>
+        <pre id="rejected-output"></pre>
+        <div class="result-title"><strong>模型原始输出</strong></div>
+        <pre id="raw-output"></pre>
+      </div>
+    </section>
+  </div>
+</main>
+<script>
+  const sampleSelect = document.getElementById('sample-select');
+  const inputText = document.getElementById('input-text');
+  const fieldList = document.getElementById('field-list');
+  const extractButton = document.getElementById('extract-button');
+  const strictMode = document.getElementById('strict-mode');
+  const modelSelect = document.getElementById('model-select');
+  const errorBox = document.getElementById('error-box');
+  let config;
+
+  const selectedFields = () => [...document.querySelectorAll('input[name="field"]:checked')].map(x => x.value);
+  function updateCount() { document.getElementById('field-count').textContent = `已选 ${selectedFields().length} 项`; }
+  function formatMs(value) { return value < 1 ? `${value.toFixed(3)} ms` : value < 1000 ? `${value.toFixed(1)} ms` : `${(value/1000).toFixed(2)} s`; }
+  function showError(message) {
+    errorBox.replaceChildren();
+    if (!message) return;
+    const box = document.createElement('div'); box.className = 'error'; box.textContent = message;
+    errorBox.appendChild(box);
+  }
+
+  async function initialize() {
+    const response = await fetch('/api/config');
+    config = await response.json();
+    document.getElementById('model-status').textContent = `${config.model} 已加载 · ${formatMs(config.load_ms)}`;
+    modelSelect.innerHTML = config.models.map(model => `<option value="${model}">PP-UIE-${model.toUpperCase()}</option>`).join('');
+    modelSelect.value = config.model; modelSelect.disabled = false;
+    sampleSelect.innerHTML = '<option value="custom">自定义文本</option>' + config.samples.map((row, i) => `<option value="${i}">${row.label}</option>`).join('');
+    config.field_groups.forEach((group, groupIndex) => {
+      const container = document.createElement('div'); container.className = 'group'; container.dataset.group = groupIndex;
+      container.innerHTML = `<div class="group-name">${group.name}</div><div class="checks">${group.fields.map(field => `<label class="chip"><input type="checkbox" name="field" value="${field}"><span>${field}</span></label>`).join('')}</div>`;
+      fieldList.appendChild(container);
+    });
+    document.querySelectorAll('input[name="field"]').forEach(input => input.addEventListener('change', updateCount));
+    sampleSelect.value = '0'; inputText.value = config.samples[0].text;
+    document.querySelectorAll('[data-group="0"] input[name="field"]').forEach(input => input.checked = ['分辨率','帧率','色彩模式','曝光补偿','感光度','白平衡','胶片影调'].includes(input.value));
+    updateCount();
+  }
+
+  sampleSelect.addEventListener('change', () => { if (sampleSelect.value !== 'custom') inputText.value = config.samples[Number(sampleSelect.value)].text; });
+  inputText.addEventListener('input', () => { sampleSelect.value = 'custom'; });
+  modelSelect.addEventListener('change', async () => {
+    const requestedModel = modelSelect.value;
+    modelSelect.disabled = true; extractButton.disabled = true;
+    document.getElementById('model-status').textContent = `正在释放当前模型并加载 ${requestedModel}…`;
+    showError('');
+    try {
+      const response = await fetch('/api/model', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({model:requestedModel}) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || '模型切换失败');
+      config.model = data.model;
+      document.getElementById('model-status').textContent = `${data.model} 已加载 · ${formatMs(data.load_ms)}`;
+    } catch (error) {
+      showError(error.message);
+      document.getElementById('model-status').textContent = '模型切换失败';
+    } finally {
+      modelSelect.disabled = false; extractButton.disabled = false;
+    }
+  });
+  document.getElementById('clear-fields').addEventListener('click', () => { document.querySelectorAll('input[name="field"]').forEach(x => x.checked = false); updateCount(); });
+  document.getElementById('select-camera').addEventListener('click', () => { document.querySelectorAll('input[name="field"]').forEach(x => x.checked = x.closest('.group').dataset.group === '0'); updateCount(); });
+
+  extractButton.addEventListener('click', async () => {
+    showError('');
+    const fields = selectedFields();
+    if (!inputText.value.trim() || !fields.length) { showError('请输入文本并至少选择一个字段。'); return; }
+    extractButton.disabled = true; extractButton.textContent = '正在提取，请稍候…';
+    try {
+      const response = await fetch('/api/extract', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text:inputText.value, fields, strict:strictMode.checked}) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || '提取失败');
+      document.getElementById('result-placeholder').hidden = true; document.getElementById('result-content').hidden = false;
+      document.getElementById('elapsed').textContent = formatMs(data.timing_ms.total);
+      document.getElementById('inference-time').textContent = formatMs(data.timing_ms.inference);
+      document.getElementById('schema-time').textContent = formatMs(data.timing_ms.schema);
+      document.getElementById('result-model').textContent = `${data.model} · ${data.strict_mode ? '严格模式' : '原始模式'}`;
+      document.getElementById('normalized-output').textContent = JSON.stringify(data.normalized_output, null, 2);
+      document.getElementById('verified-output').textContent = JSON.stringify(data.verified_output, null, 2);
+      document.getElementById('rejected-output').textContent = JSON.stringify(data.rejected_candidates, null, 2);
+      document.getElementById('raw-output').textContent = JSON.stringify(data.raw_output, null, 2);
+    } catch (error) { showError(error.message); }
+    finally { extractButton.disabled = false; extractButton.textContent = '开始提取'; }
+  });
+  initialize().catch(error => { document.getElementById('model-status').textContent = '服务连接失败'; showError(error.message); });
+</script>
+</body>
+</html>

@@ -1,0 +1,1151 @@
+{
+  "model": "0.5b",
+  "model_load_ms": 11651.062334,
+  "strict": true,
+  "fields": [
+    "白平衡",
+    "APP美颜",
+    "锐度",
+    "去噪",
+    "纹理",
+    "分辨率",
+    "帧率",
+    "胶片影调",
+    "滤镜浓度",
+    "色彩模式",
+    "感光度",
+    "曝光补偿",
+    "快门速度"
+  ],
+  "records": [
+    {
+      "id": "pocket_user_01",
+      "model": "0.5b",
+      "fields": [
+        "白平衡",
+        "APP美颜",
+        "锐度",
+        "去噪",
+        "纹理",
+        "分辨率",
+        "帧率",
+        "胶片影调",
+        "滤镜浓度",
+        "色彩模式",
+        "感光度",
+        "曝光补偿",
+        "快门速度"
+      ],
+      "raw_output": {
+        "白平衡": [
+          {
+            "text": "AWB自动"
+          }
+        ],
+        "APP美颜": [],
+        "锐度": [
+          {
+            "text": "4"
+          }
+        ],
+        "去噪": [],
+        "纹理": [],
+        "分辨率": [],
+        "帧率": [
+          {
+            "text": "4K60帧"
+          }
+        ],
+        "胶片影调": [],
+        "滤镜浓度": [
+          {
+            "text": "美食,摩卡"
+          }
+        ],
+        "色彩模式": [
+          {
+            "text": "bit"
+          }
+        ],
+        "感光度": [
+          {
+            "text": "-0.3EV"
+          }
+        ],
+        "曝光补偿": [
+          {
+            "text": "-0.3EV"
+          }
+        ],
+        "快门速度": [
+          {
+            "text": "4"
+          }
+        ]
+      },
+      "strict_mode": true,
+      "normalized_output": {
+        "白平衡": [
+          "AWB"
+        ],
+        "帧率": [
+          "60fps"
+        ],
+        "曝光补偿": [
+          "-0.3"
+        ]
+      },
+      "verified_output": {
+        "白平衡": [
+          {
+            "value": "AWB",
+            "raw_value": "AWB自动",
+            "evidence": "白平衡：AWB自动"
+          }
+        ],
+        "帧率": [
+          {
+            "value": "60fps",
+            "raw_value": "4K60帧",
+            "evidence": "拍照：标准（视频4K60帧）"
+          }
+        ],
+        "曝光补偿": [
+          {
+            "value": "-0.3",
+            "raw_value": "-0.3EV",
+            "evidence": "曝光：-0.3EV"
+          }
+        ]
+      },
+      "rejected_candidates": [
+        {
+          "field": "锐度",
+          "value": "4",
+          "reasons": [
+            "value_not_allowed"
+          ],
+          "evidence": "阴影-5、白色5、锐度4"
+        },
+        {
+          "field": "滤镜浓度",
+          "value": "美食,摩卡",
+          "reasons": [
+            "value_not_in_source",
+            "value_not_allowed"
+          ]
+        },
+        {
+          "field": "色彩模式",
+          "value": "bit",
+          "reasons": [
+            "value_not_allowed",
+            "field_value_mismatch"
+          ],
+          "evidence": "色彩：普通bit"
+        },
+        {
+          "field": "感光度",
+          "value": "-0.3EV",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "曝光：-0.3EV"
+        },
+        {
+          "field": "快门速度",
+          "value": "4",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "## 好喜欢用Pocket4记录生活📸 分享一下我常用的拍摄参数 🖐🏻机内参数"
+        }
+      ],
+      "field_status": {
+        "白平衡": "verified",
+        "APP美颜": "not_found",
+        "锐度": "rejected",
+        "去噪": "not_found",
+        "纹理": "not_found",
+        "分辨率": "not_found",
+        "帧率": "verified",
+        "胶片影调": "not_found",
+        "滤镜浓度": "rejected",
+        "色彩模式": "rejected",
+        "感光度": "rejected",
+        "曝光补偿": "verified",
+        "快门速度": "rejected"
+      },
+      "timing_ms": {
+        "schema": 0.03187499999768306,
+        "inference": 18099.205834000004,
+        "total": 18099.237709,
+        "model_load_excluded": true
+      }
+    },
+    {
+      "id": "pocket_user_02",
+      "model": "0.5b",
+      "fields": [
+        "白平衡",
+        "APP美颜",
+        "锐度",
+        "去噪",
+        "纹理",
+        "分辨率",
+        "帧率",
+        "胶片影调",
+        "滤镜浓度",
+        "色彩模式",
+        "感光度",
+        "曝光补偿",
+        "快门速度"
+      ],
+      "raw_output": {
+        "白平衡": [
+          {
+            "text": "AWB"
+          }
+        ],
+        "APP美颜": [],
+        "锐度": [],
+        "去噪": [],
+        "纹理": [],
+        "分辨率": [
+          {
+            "text": "4k"
+          }
+        ],
+        "帧率": [
+          {
+            "text": "4k60帧"
+          }
+        ],
+        "胶片影调": [
+          {
+            "text": "CC50%"
+          }
+        ],
+        "滤镜浓度": [],
+        "色彩模式": [
+          {
+            "text": "普通"
+          }
+        ],
+        "感光度": [
+          {
+            "text": "+0.0ev"
+          }
+        ],
+        "曝光补偿": [
+          {
+            "text": "+0.0ev"
+          }
+        ],
+        "快门速度": [
+          {
+            "text": "+0.0ev"
+          }
+        ]
+      },
+      "strict_mode": true,
+      "normalized_output": {
+        "白平衡": [
+          "AWB"
+        ],
+        "分辨率": [
+          "4K"
+        ],
+        "帧率": [
+          "60fps"
+        ],
+        "胶片影调": [
+          "CC胶片"
+        ],
+        "色彩模式": [
+          "普通"
+        ],
+        "曝光补偿": [
+          "0.0"
+        ]
+      },
+      "verified_output": {
+        "白平衡": [
+          {
+            "value": "AWB",
+            "raw_value": "AWB",
+            "evidence": "白平衡：AWB"
+          }
+        ],
+        "分辨率": [
+          {
+            "value": "4K",
+            "raw_value": "4k",
+            "evidence": "4k60帧"
+          }
+        ],
+        "帧率": [
+          {
+            "value": "60fps",
+            "raw_value": "4k60帧",
+            "evidence": "4k60帧"
+          }
+        ],
+        "胶片影调": [
+          {
+            "value": "CC胶片",
+            "raw_value": "CC50%",
+            "evidence": "胶片影调：CC50%"
+          }
+        ],
+        "色彩模式": [
+          {
+            "value": "普通",
+            "raw_value": "普通",
+            "evidence": "色彩：普通10bit"
+          }
+        ],
+        "曝光补偿": [
+          {
+            "value": "0.0",
+            "raw_value": "+0.0ev",
+            "evidence": "曝光：+0.0ev"
+          }
+        ]
+      },
+      "rejected_candidates": [
+        {
+          "field": "感光度",
+          "value": "+0.0ev",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "曝光：+0.0ev"
+        },
+        {
+          "field": "快门速度",
+          "value": "+0.0ev",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "曝光：+0.0ev"
+        }
+      ],
+      "field_status": {
+        "白平衡": "verified",
+        "APP美颜": "not_found",
+        "锐度": "not_found",
+        "去噪": "not_found",
+        "纹理": "not_found",
+        "分辨率": "verified",
+        "帧率": "verified",
+        "胶片影调": "verified",
+        "滤镜浓度": "not_found",
+        "色彩模式": "verified",
+        "感光度": "rejected",
+        "曝光补偿": "verified",
+        "快门速度": "rejected"
+      },
+      "timing_ms": {
+        "schema": 0.036582999996426224,
+        "inference": 16957.597457999997,
+        "total": 16957.634040999994,
+        "model_load_excluded": true
+      }
+    },
+    {
+      "id": "pocket_user_03",
+      "model": "0.5b",
+      "fields": [
+        "白平衡",
+        "APP美颜",
+        "锐度",
+        "去噪",
+        "纹理",
+        "分辨率",
+        "帧率",
+        "胶片影调",
+        "滤镜浓度",
+        "色彩模式",
+        "感光度",
+        "曝光补偿",
+        "快门速度"
+      ],
+      "raw_output": {
+        "白平衡": [
+          {
+            "text": "AWB"
+          }
+        ],
+        "APP美颜": [],
+        "锐度": [],
+        "去噪": [],
+        "纹理": [
+          {
+            "text": "玄米"
+          }
+        ],
+        "分辨率": [
+          {
+            "text": "10bit"
+          }
+        ],
+        "帧率": [
+          {
+            "text": "4k60帧"
+          }
+        ],
+        "胶片影调": [
+          {
+            "text": "NC50%"
+          }
+        ],
+        "滤镜浓度": [
+          {
+            "text": "50-6400"
+          }
+        ],
+        "色彩模式": [
+          {
+            "text": "AWB"
+          }
+        ],
+        "感光度": [
+          {
+            "text": "50-6400"
+          }
+        ],
+        "曝光补偿": [
+          {
+            "text": "+0.3ev"
+          }
+        ],
+        "快门速度": [
+          {
+            "text": "+0.3ev"
+          }
+        ]
+      },
+      "strict_mode": true,
+      "normalized_output": {
+        "白平衡": [
+          "AWB"
+        ],
+        "帧率": [
+          "60fps"
+        ],
+        "胶片影调": [
+          "NC胶片"
+        ],
+        "感光度": [
+          "50-6400"
+        ],
+        "曝光补偿": [
+          "+0.3"
+        ]
+      },
+      "verified_output": {
+        "白平衡": [
+          {
+            "value": "AWB",
+            "raw_value": "AWB",
+            "evidence": "白平衡：AWB"
+          }
+        ],
+        "帧率": [
+          {
+            "value": "60fps",
+            "raw_value": "4k60帧",
+            "evidence": "4k60帧"
+          }
+        ],
+        "胶片影调": [
+          {
+            "value": "NC胶片",
+            "raw_value": "NC50%",
+            "evidence": "胶片影调：NC50%"
+          }
+        ],
+        "感光度": [
+          {
+            "value": "50-6400",
+            "raw_value": "50-6400",
+            "evidence": "ISO：50-6400"
+          }
+        ],
+        "曝光补偿": [
+          {
+            "value": "+0.3",
+            "raw_value": "+0.3ev",
+            "evidence": "曝光：+0.3ev"
+          }
+        ]
+      },
+      "rejected_candidates": [
+        {
+          "field": "纹理",
+          "value": "玄米",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "终于吃到玄米布丁船啦布丁🍮✨"
+        },
+        {
+          "field": "分辨率",
+          "value": "10bit",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "色彩：普通10bit"
+        },
+        {
+          "field": "滤镜浓度",
+          "value": "50-6400",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "ISO：50-6400"
+        },
+        {
+          "field": "色彩模式",
+          "value": "AWB",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "白平衡：AWB"
+        },
+        {
+          "field": "快门速度",
+          "value": "+0.3ev",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "曝光：+0.3ev"
+        }
+      ],
+      "field_status": {
+        "白平衡": "verified",
+        "APP美颜": "not_found",
+        "锐度": "not_found",
+        "去噪": "not_found",
+        "纹理": "rejected",
+        "分辨率": "rejected",
+        "帧率": "verified",
+        "胶片影调": "verified",
+        "滤镜浓度": "rejected",
+        "色彩模式": "rejected",
+        "感光度": "verified",
+        "曝光补偿": "verified",
+        "快门速度": "rejected"
+      },
+      "timing_ms": {
+        "schema": 0.013957999996705439,
+        "inference": 18130.065416999998,
+        "total": 18130.079374999994,
+        "model_load_excluded": true
+      }
+    },
+    {
+      "id": "pocket_user_04",
+      "model": "0.5b",
+      "fields": [
+        "白平衡",
+        "APP美颜",
+        "锐度",
+        "去噪",
+        "纹理",
+        "分辨率",
+        "帧率",
+        "胶片影调",
+        "滤镜浓度",
+        "色彩模式",
+        "感光度",
+        "曝光补偿",
+        "快门速度"
+      ],
+      "raw_output": {
+        "白平衡": [
+          {
+            "text": "4800k"
+          }
+        ],
+        "APP美颜": [],
+        "锐度": [],
+        "去噪": [
+          {
+            "text": "0"
+          }
+        ],
+        "纹理": [
+          {
+            "text": "0"
+          }
+        ],
+        "分辨率": [
+          {
+            "text": "4K"
+          }
+        ],
+        "帧率": [
+          {
+            "text": "30%"
+          }
+        ],
+        "胶片影调": [
+          {
+            "text": "CC胶片"
+          }
+        ],
+        "滤镜浓度": [],
+        "色彩模式": [
+          {
+            "text": "CC胶片"
+          }
+        ],
+        "感光度": [
+          {
+            "text": "-0.3EV"
+          }
+        ],
+        "曝光补偿": [
+          {
+            "text": "0.3EV"
+          }
+        ],
+        "快门速度": [
+          {
+            "text": "-0.3EV"
+          }
+        ]
+      },
+      "strict_mode": true,
+      "normalized_output": {
+        "白平衡": [
+          "4800K"
+        ],
+        "去噪": [
+          "0"
+        ],
+        "纹理": [
+          "0"
+        ],
+        "分辨率": [
+          "4K"
+        ],
+        "胶片影调": [
+          "CC胶片"
+        ]
+      },
+      "verified_output": {
+        "白平衡": [
+          {
+            "value": "4800K",
+            "raw_value": "4800k",
+            "evidence": "白平衡：4800k 色调+10"
+          }
+        ],
+        "去噪": [
+          {
+            "value": "0",
+            "raw_value": "0",
+            "evidence": "图像调节：纹理0去噪0"
+          }
+        ],
+        "纹理": [
+          {
+            "value": "0",
+            "raw_value": "0",
+            "evidence": "图像调节：纹理0去噪0"
+          }
+        ],
+        "分辨率": [
+          {
+            "value": "4K",
+            "raw_value": "4K",
+            "evidence": "分辨率：4K60p"
+          }
+        ],
+        "胶片影调": [
+          {
+            "value": "CC胶片",
+            "raw_value": "CC胶片",
+            "evidence": "胶片影调：CC胶片30%"
+          }
+        ]
+      },
+      "rejected_candidates": [
+        {
+          "field": "帧率",
+          "value": "30%",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "胶片影调：CC胶片30%"
+        },
+        {
+          "field": "色彩模式",
+          "value": "CC胶片",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "胶片影调：CC胶片30%"
+        },
+        {
+          "field": "感光度",
+          "value": "-0.3EV",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "曝光：-0.3EV"
+        },
+        {
+          "field": "曝光补偿",
+          "value": "0.3EV",
+          "reasons": [
+            "numeric_sign_mismatch",
+            "value_not_allowed",
+            "field_value_mismatch"
+          ],
+          "evidence": "曝光：-0.3EV"
+        },
+        {
+          "field": "快门速度",
+          "value": "-0.3EV",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "曝光：-0.3EV"
+        }
+      ],
+      "field_status": {
+        "白平衡": "verified",
+        "APP美颜": "not_found",
+        "锐度": "not_found",
+        "去噪": "verified",
+        "纹理": "verified",
+        "分辨率": "verified",
+        "帧率": "rejected",
+        "胶片影调": "verified",
+        "滤镜浓度": "not_found",
+        "色彩模式": "rejected",
+        "感光度": "rejected",
+        "曝光补偿": "rejected",
+        "快门速度": "rejected"
+      },
+      "timing_ms": {
+        "schema": 0.014292000003024441,
+        "inference": 14455.568333000003,
+        "total": 14455.582625000006,
+        "model_load_excluded": true
+      }
+    },
+    {
+      "id": "pocket_user_05",
+      "model": "0.5b",
+      "fields": [
+        "白平衡",
+        "APP美颜",
+        "锐度",
+        "去噪",
+        "纹理",
+        "分辨率",
+        "帧率",
+        "胶片影调",
+        "滤镜浓度",
+        "色彩模式",
+        "感光度",
+        "曝光补偿",
+        "快门速度"
+      ],
+      "raw_output": {
+        "白平衡": [
+          {
+            "text": "自动"
+          }
+        ],
+        "APP美颜": [],
+        "锐度": [],
+        "去噪": [
+          {
+            "text": "1"
+          }
+        ],
+        "纹理": [
+          {
+            "text": "荔枝纹"
+          }
+        ],
+        "分辨率": [
+          {
+            "text": "4k50"
+          }
+        ],
+        "帧率": [
+          {
+            "text": "4k50"
+          }
+        ],
+        "胶片影调": [],
+        "滤镜浓度": [
+          {
+            "text": "NC70%"
+          }
+        ],
+        "色彩模式": [
+          {
+            "text": "普通模式"
+          }
+        ],
+        "感光度": [
+          {
+            "text": "800"
+          }
+        ],
+        "曝光补偿": [
+          {
+            "text": "0"
+          }
+        ],
+        "快门速度": [
+          {
+            "text": "0"
+          }
+        ]
+      },
+      "strict_mode": true,
+      "normalized_output": {
+        "白平衡": [
+          "AWB"
+        ],
+        "去噪": [
+          "1"
+        ],
+        "分辨率": [
+          "4K"
+        ],
+        "帧率": [
+          "50fps"
+        ],
+        "滤镜浓度": [
+          "70%"
+        ],
+        "色彩模式": [
+          "普通"
+        ],
+        "感光度": [
+          "800"
+        ]
+      },
+      "verified_output": {
+        "白平衡": [
+          {
+            "value": "AWB",
+            "raw_value": "自动",
+            "evidence": "▪️白平衡：自动"
+          }
+        ],
+        "去噪": [
+          {
+            "value": "1",
+            "raw_value": "1",
+            "evidence": "▪️图像调节：去噪1 纹理1"
+          }
+        ],
+        "分辨率": [
+          {
+            "value": "4K",
+            "raw_value": "4k50",
+            "evidence": "▪️分辨率：4k50"
+          }
+        ],
+        "帧率": [
+          {
+            "value": "50fps",
+            "raw_value": "4k50",
+            "evidence": "▪️分辨率：4k50"
+          }
+        ],
+        "滤镜浓度": [
+          {
+            "value": "70%",
+            "raw_value": "NC70%",
+            "evidence": "▪️滤镜：NC70%"
+          }
+        ],
+        "色彩模式": [
+          {
+            "value": "普通",
+            "raw_value": "普通模式",
+            "evidence": "▪️色彩：普通模式"
+          }
+        ],
+        "感光度": [
+          {
+            "value": "800",
+            "raw_value": "800",
+            "evidence": "▪️ISO：800"
+          }
+        ]
+      },
+      "rejected_candidates": [
+        {
+          "field": "纹理",
+          "value": "荔枝纹",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "✔️绿巨能action街拍套装：兔笼+街拍手柄的组合，兔笼是全包式铝合金，给相机整体性的框架保护，加上这个手柄有一种按单反的顺滑感，手柄处还是荔枝纹的，非常高级有质感，刚看到图片就被颜值俘获了😍"
+        },
+        {
+          "field": "曝光补偿",
+          "value": "0",
+          "reasons": [
+            "field_value_mismatch"
+          ],
+          "evidence": "▪️曝光：-0.3（室内阴暗建议调整到0）"
+        },
+        {
+          "field": "快门速度",
+          "value": "0",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "▪️分辨率：4k50"
+        }
+      ],
+      "field_status": {
+        "白平衡": "verified",
+        "APP美颜": "not_found",
+        "锐度": "not_found",
+        "去噪": "verified",
+        "纹理": "rejected",
+        "分辨率": "verified",
+        "帧率": "verified",
+        "胶片影调": "not_found",
+        "滤镜浓度": "verified",
+        "色彩模式": "verified",
+        "感光度": "verified",
+        "曝光补偿": "rejected",
+        "快门速度": "rejected"
+      },
+      "timing_ms": {
+        "schema": 0.012458999989917174,
+        "inference": 27810.786000000007,
+        "total": 27810.798458999998,
+        "model_load_excluded": true
+      }
+    },
+    {
+      "id": "pocket_user_06",
+      "model": "0.5b",
+      "fields": [
+        "白平衡",
+        "APP美颜",
+        "锐度",
+        "去噪",
+        "纹理",
+        "分辨率",
+        "帧率",
+        "胶片影调",
+        "滤镜浓度",
+        "色彩模式",
+        "感光度",
+        "曝光补偿",
+        "快门速度"
+      ],
+      "raw_output": {
+        "白平衡": [
+          {
+            "text": "自动"
+          }
+        ],
+        "APP美颜": [],
+        "锐度": [
+          {
+            "text": "+10"
+          }
+        ],
+        "去噪": [
+          {
+            "text": "1"
+          }
+        ],
+        "纹理": [],
+        "分辨率": [
+          {
+            "text": "4k50"
+          }
+        ],
+        "帧率": [
+          {
+            "text": "4k50"
+          }
+        ],
+        "胶片影调": [],
+        "滤镜浓度": [
+          {
+            "text": "NC70%"
+          }
+        ],
+        "色彩模式": [
+          {
+            "text": "普通模式"
+          }
+        ],
+        "感光度": [
+          {
+            "text": "100-800"
+          }
+        ],
+        "曝光补偿": [
+          {
+            "text": "0"
+          }
+        ],
+        "快门速度": [
+          {
+            "text": "0"
+          }
+        ]
+      },
+      "strict_mode": true,
+      "normalized_output": {
+        "白平衡": [
+          "AWB"
+        ],
+        "去噪": [
+          "1"
+        ],
+        "分辨率": [
+          "4K"
+        ],
+        "帧率": [
+          "50fps"
+        ],
+        "滤镜浓度": [
+          "70%"
+        ],
+        "色彩模式": [
+          "普通"
+        ],
+        "感光度": [
+          "100-800"
+        ]
+      },
+      "verified_output": {
+        "白平衡": [
+          {
+            "value": "AWB",
+            "raw_value": "自动",
+            "evidence": "▪️白平衡：自动"
+          }
+        ],
+        "去噪": [
+          {
+            "value": "1",
+            "raw_value": "1",
+            "evidence": "▪️图像调节：去噪1 纹理1"
+          }
+        ],
+        "分辨率": [
+          {
+            "value": "4K",
+            "raw_value": "4k50",
+            "evidence": "▪️分辨率：4k50"
+          }
+        ],
+        "帧率": [
+          {
+            "value": "50fps",
+            "raw_value": "4k50",
+            "evidence": "▪️分辨率：4k50"
+          }
+        ],
+        "滤镜浓度": [
+          {
+            "value": "70%",
+            "raw_value": "NC70%",
+            "evidence": "▪️滤镜：NC70%"
+          }
+        ],
+        "色彩模式": [
+          {
+            "value": "普通",
+            "raw_value": "普通模式",
+            "evidence": "▪️色彩：普通模式"
+          }
+        ],
+        "感光度": [
+          {
+            "value": "100-800",
+            "raw_value": "100-800",
+            "evidence": "▪️ISO：100-800"
+          }
+        ]
+      },
+      "rejected_candidates": [
+        {
+          "field": "锐度",
+          "value": "+10",
+          "reasons": [
+            "value_not_allowed"
+          ],
+          "evidence": "▫️锐化：+10"
+        },
+        {
+          "field": "曝光补偿",
+          "value": "0",
+          "reasons": [
+            "field_value_mismatch"
+          ],
+          "evidence": "▪️曝光：-0.3（室内阴暗建议调整到0）"
+        },
+        {
+          "field": "快门速度",
+          "value": "0",
+          "reasons": [
+            "value_not_allowed",
+            "field_evidence_missing"
+          ],
+          "evidence": "▪️分辨率：4k50"
+        }
+      ],
+      "field_status": {
+        "白平衡": "verified",
+        "APP美颜": "not_found",
+        "锐度": "rejected",
+        "去噪": "verified",
+        "纹理": "not_found",
+        "分辨率": "verified",
+        "帧率": "verified",
+        "胶片影调": "not_found",
+        "滤镜浓度": "verified",
+        "色彩模式": "verified",
+        "感光度": "verified",
+        "曝光补偿": "rejected",
+        "快门速度": "rejected"
+      },
+      "timing_ms": {
+        "schema": 0.012040999990858836,
+        "inference": 17368.86179199999,
+        "total": 17368.87383299998,
+        "model_load_excluded": true
+      }
+    }
+  ]
+}
