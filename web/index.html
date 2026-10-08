@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PP-UIE Pocket 参数提取</title>
+  <title>Pocket 参数提取</title>
   <style>
     :root { color-scheme: light; --ink:#172033; --muted:#667085; --line:#d8deea; --brand:#3157d5; --soft:#f3f6fc; --ok:#0b8f55; }
     * { box-sizing: border-box; }
@@ -51,7 +51,7 @@
 <body>
 <main>
   <header>
-    <div><h1>Pocket 参数提取</h1><p class="subtitle">选择文本与字段，使用已驻留内存的 PP-UIE 模型进行动态 Schema 抽取。</p></div>
+    <div><h1>Pocket 参数提取</h1><p class="subtitle">选择文本、字段与本地模型，进行动态 Schema 信息抽取。</p></div>
     <div class="model-control"><label for="model-select">模型</label><select id="model-select" disabled></select><div class="status" id="model-status">正在连接模型…</div></div>
   </header>
   <div class="grid">
@@ -137,12 +137,34 @@
     });
   }
 
+  function renderModelOptions(models) {
+    modelSelect.replaceChildren();
+    models.forEach(model => {
+      const option = document.createElement('option');
+      option.value = model.id;
+      option.textContent = model.label;
+      modelSelect.appendChild(option);
+    });
+  }
+
+  function modelLabel(modelId) {
+    const model = config.models.find(item => item.id === modelId);
+    return model ? model.label : modelId;
+  }
+
   async function initialize() {
     const response = await fetch('/api/config');
     config = await response.json();
-    document.getElementById('model-status').textContent = `${config.model} 已加载 · ${formatMs(config.load_ms)}`;
-    modelSelect.innerHTML = config.models.map(model => `<option value="${model}">PP-UIE-${model.toUpperCase()}</option>`).join('');
-    modelSelect.value = config.model; modelSelect.disabled = false;
+    renderModelOptions(config.models);
+    if (config.model) {
+      document.getElementById('model-status').textContent = `${modelLabel(config.model)} 已加载 · ${formatMs(config.load_ms)}`;
+      modelSelect.value = config.model;
+    } else {
+      document.getElementById('model-status').textContent = '当前无活动模型，请选择模型';
+      modelSelect.selectedIndex = -1;
+      extractButton.disabled = true;
+    }
+    modelSelect.disabled = false;
     renderSampleOptions(config.samples);
     config.field_groups.forEach((group, groupIndex) => {
       const container = document.createElement('div'); container.className = 'group'; container.dataset.group = groupIndex;
@@ -160,19 +182,21 @@
   modelSelect.addEventListener('change', async () => {
     const requestedModel = modelSelect.value;
     modelSelect.disabled = true; extractButton.disabled = true;
-    document.getElementById('model-status').textContent = `正在释放当前模型并加载 ${requestedModel}…`;
+    document.getElementById('model-status').textContent = `正在释放当前模型并加载 ${modelLabel(requestedModel)}…`;
     showError('');
     try {
       const response = await fetch('/api/model', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({model:requestedModel}) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || '模型切换失败');
       config.model = data.model;
-      document.getElementById('model-status').textContent = `${data.model} 已加载 · ${formatMs(data.load_ms)}`;
+      document.getElementById('model-status').textContent = `${modelLabel(data.model)} 已加载 · ${formatMs(data.load_ms)}`;
     } catch (error) {
+      config.model = null;
+      modelSelect.selectedIndex = -1;
       showError(error.message);
-      document.getElementById('model-status').textContent = '模型切换失败';
+      document.getElementById('model-status').textContent = '模型切换失败 · 当前无活动模型，请重新选择';
     } finally {
-      modelSelect.disabled = false; extractButton.disabled = false;
+      modelSelect.disabled = false; extractButton.disabled = !config.model;
     }
   });
   document.getElementById('clear-fields').addEventListener('click', () => { document.querySelectorAll('input[name="field"]').forEach(x => x.checked = false); updateCount(); });

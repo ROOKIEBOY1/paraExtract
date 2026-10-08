@@ -11,18 +11,41 @@ import requests
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from pp_uie.models import MODEL_FILES, MODEL_SPECS, download_model, manifest_as_dict, validate_model_dir
+from pp_uie.uie_models import (
+    UIE_MODEL_SPECS,
+    download_uie_model,
+    validate_uie_model_dir,
+)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", choices=["0.5b", "1.5b", "all"], required=True)
+    parser.add_argument(
+        "--model", choices=["0.5b", "1.5b", *UIE_MODEL_SPECS, "all"], required=True
+    )
     parser.add_argument("--destination", type=Path, default=Path("models"))
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--verify-only", action="store_true")
     args = parser.parse_args()
-    keys = list(MODEL_SPECS) if args.model == "all" else [args.model]
+    keys = [*MODEL_SPECS, *UIE_MODEL_SPECS] if args.model == "all" else [args.model]
     manifests = {}
     for key in keys:
+        if key in UIE_MODEL_SPECS:
+            spec = UIE_MODEL_SPECS[key]
+            if args.dry_run:
+                for resource in spec.files.values():
+                    print(resource["url"])
+                continue
+            if args.verify_only:
+                report = validate_uie_model_dir(args.destination / spec.directory, key)
+                manifests[key] = {
+                    "valid": report.valid,
+                    "total_bytes": report.total_bytes,
+                    "files": report.files,
+                }
+            else:
+                manifests[key] = download_uie_model(key, args.destination, requests.Session())
+            continue
         spec = MODEL_SPECS[key]
         if args.dry_run:
             for filename in MODEL_FILES:
@@ -42,4 +65,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

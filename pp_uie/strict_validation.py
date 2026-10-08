@@ -203,6 +203,18 @@ def _label_value_mismatch(field: str, line: str, raw: str) -> bool:
     return found_label
 
 
+def _span_offsets_match(text: str, item: dict[str, Any], candidate: str) -> bool:
+    if "start" not in item and "end" not in item:
+        return True
+    start = item.get("start")
+    end = item.get("end")
+    if not isinstance(start, int) or not isinstance(end, int):
+        return False
+    if start < 0 or end < start or end > len(text):
+        return False
+    return text[start:end] == candidate
+
+
 def validate_extraction(text: str, raw: dict[str, Any], fields: Sequence[str]) -> dict[str, Any]:
     verified: dict[str, list[dict[str, str]]] = {}
     normalized: dict[str, list[str]] = {}
@@ -219,6 +231,8 @@ def validate_extraction(text: str, raw: dict[str, Any], fields: Sequence[str]) -
             reasons = []
             line = _evidence_line(text, field, candidate)
             value = _normalize(field, candidate)
+            if isinstance(item, dict) and not _span_offsets_match(text, item, candidate):
+                reasons.append("span_offset_mismatch")
             if line is None:
                 reasons.append("value_not_in_source")
             elif _has_sign_mismatch(text, candidate):

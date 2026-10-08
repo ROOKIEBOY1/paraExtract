@@ -117,3 +117,22 @@ def test_later_suggested_value_is_not_accepted_as_labeled_exposure():
     )
     assert result["normalized_output"] == {}
     assert "field_value_mismatch" in result["rejected_candidates"][0]["reasons"]
+
+
+def test_strict_validation_rejects_span_offset_mismatch_without_mutating_raw():
+    raw = {
+        "感光度": [
+            {"text": "800", "start": 0, "end": 3, "probability": 0.987}
+        ]
+    }
+    original = {
+        "感光度": [
+            {"text": "800", "start": 0, "end": 3, "probability": 0.987}
+        ]
+    }
+
+    result = validate_extraction("ISO：800", raw, ["感光度"])
+
+    assert raw == original
+    assert result["normalized_output"] == {}
+    assert "span_offset_mismatch" in result["rejected_candidates"][0]["reasons"]

@@ -14,7 +14,10 @@ def test_http_server_serves_page_config_and_extraction(tmp_path):
 
     class App:
         def config(self):
-            return {"model": "fixture"}
+            return {
+                "model": "fixture",
+                "models": [{"id": "fixture", "label": "Fixture <safe>"}],
+            }
 
         def extract(self, payload):
             return {"received": payload}
@@ -33,7 +36,10 @@ def test_http_server_serves_page_config_and_extraction(tmp_path):
         with urlopen(base + "/") as response:
             assert response.read().decode() == "<h1>fixture page</h1>"
         with urlopen(base + "/api/config") as response:
-            assert json.load(response) == {"model": "fixture"}
+            assert json.load(response) == {
+                "model": "fixture",
+                "models": [{"id": "fixture", "label": "Fixture <safe>"}],
+            }
         request = Request(
             base + "/api/extract",
             data=json.dumps({"text": "x", "fields": ["ISO"]}).encode(),

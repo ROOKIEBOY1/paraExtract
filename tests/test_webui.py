@@ -3,8 +3,11 @@ from pathlib import Path
 
 import pytest
 import pp_uie.webui as webui
+import scripts.web_ui as web_ui_script
 
-from pp_uie.backend import RuntimeConfig
+from pp_uie.backend import PPUIEBackend, RuntimeConfig
+from pp_uie.model_registry import ModelDefinition, model_options
+from pp_uie.uie_backend import UIETaskflowBackend, UIETaskflowConfig
 from pp_uie.webui import (
     ExtractionService,
     FIELD_GROUPS,
@@ -60,9 +63,7 @@ def test_service_loads_model_once_and_reuses_it_for_dynamic_fields(tmp_path):
 
     ticks = iter(index / 1000 for index in range(30))
     service = ExtractionService.create(
-        RuntimeConfig(tmp_path),
-        model_name="0.5b",
-        backend_factory=Backend,
+        ModelDefinition("0.5b", "PP-UIE-0.5B", RuntimeConfig(tmp_path), Backend),
         clock=lambda: next(ticks),
     )
     first = service.extract("sample one", ["曝光", "ISO"], strict=False)
@@ -82,6 +83,39 @@ def test_service_loads_model_once_and_reuses_it_for_dynamic_fields(tmp_path):
     assert service.load_ms == 1.0
 
 
+def test_service_prepares_text_aware_schema_when_backend_supports_it(tmp_path):
+    events = []
+
+    class Backend:
+        def __init__(self, config):
+            pass
+
+        def load(self):
+            pass
+
+        def set_schema(self, schema):
+            events.append(("schema", schema))
+
+        def prepare_schema(self, texts):
+            events.append(("prepare", texts))
+
+        def extract(self, texts):
+            events.append(("extract", texts))
+            return [{}]
+
+    service = ExtractionService.create(
+        ModelDefinition("uie-mini", "UIE-mini", object(), Backend)
+    )
+
+    service.extract("ISO: 800", ["感光度"], strict=False)
+
+    assert events == [
+        ("schema", ["感光度"]),
+        ("prepare", ["ISO: 800"]),
+        ("extract", ["ISO: 800"]),
+    ]
+
+
 @pytest.mark.parametrize(("text", "fields", "message"), [
     ("", ["曝光"], "text must not be empty"),
     ("sample", [], "select at least one field"),
@@ -95,7 +129,9 @@ def test_service_rejects_invalid_requests(tmp_path, text, fields, message):
         def load(self):
             pass
 
-    service = ExtractionService.create(RuntimeConfig(tmp_path), "0.5b", backend_factory=Backend)
+    service = ExtractionService.create(
+        ModelDefinition("0.5b", "PP-UIE-0.5B", RuntimeConfig(tmp_path), Backend)
+    )
     with pytest.raises(ValueError, match=message):
         service.extract(text, fields)
 
@@ -117,7 +153,9 @@ def test_service_strict_mode_returns_verified_and_rejected_candidates(tmp_path):
                 "分辨率": [{"text": "50-800"}],
             }]
 
-    service = ExtractionService.create(RuntimeConfig(tmp_path), "0.5b", backend_factory=Backend)
+    service = ExtractionService.create(
+        ModelDefinition("0.5b", "PP-UIE-0.5B", RuntimeConfig(tmp_path), Backend)
+    )
     result = service.extract("ISO：50-800", ["ISO", "Resolution"], strict=True)
     assert result["strict_mode"] is True
     assert result["fields"] == ["感光度", "分辨率"]
@@ -139,14 +177,13 @@ def test_switcher_releases_current_model_before_loading_selected_model(tmp_path)
         def close(self):
             events.append(("close", self.name))
 
-    configs = {
-        "0.5b": RuntimeConfig(tmp_path / "0.5b"),
-        "1.5b": RuntimeConfig(tmp_path / "1.5b"),
-    }
+    definitions = [
+        ModelDefinition("0.5b", "PP-UIE-0.5B", RuntimeConfig(tmp_path / "0.5b"), Backend),
+        ModelDefinition("1.5b", "PP-UIE-1.5B", RuntimeConfig(tmp_path / "1.5b"), Backend),
+    ]
     switcher = SwitchingExtractionService.create(
-        configs,
+        definitions,
         initial_model="0.5b",
-        backend_factory=Backend,
         collect_memory=lambda: events.append(("collect",)),
     )
 
@@ -173,9 +210,10 @@ def test_switcher_does_not_reload_the_already_active_model(tmp_path):
             loads.append(self.name)
 
     switcher = SwitchingExtractionService.create(
-        {"0.5b": RuntimeConfig(tmp_path / "0.5b")},
+        [ModelDefinition(
+            "0.5b", "PP-UIE-0.5B", RuntimeConfig(tmp_path / "0.5b"), Backend
+        )],
         initial_model="0.5b",
-        backend_factory=Backend,
     )
 
     assert switcher.switch_model("0.5b")["changed"] is False
@@ -191,7 +229,8 @@ def test_switcher_rejects_unknown_model(tmp_path):
             pass
 
     switcher = SwitchingExtractionService.create(
-        {"0.5b": RuntimeConfig(tmp_path)}, "0.5b", backend_factory=Backend
+        [ModelDefinition("0.5b", "PP-UIE-0.5B", RuntimeConfig(tmp_path), Backend)],
+        "0.5b",
     )
     with pytest.raises(ValueError, match="unsupported model"):
         switcher.switch_model("3b")
@@ -214,13 +253,62 @@ def test_web_page_contains_required_controls():
     assert "function renderSampleOptions" in page
     assert "document.createElement('optgroup')" in page
     assert "option.textContent = row.label" in page
+    assert "document.createElement('option')" in page
+    assert "option.value = model.id" in page
+    assert "option.textContent = model.label" in page
+    assert "modelSelect.innerHTML" not in page
+    assert "已驻留内存的 PP-UIE 模型" not in page
+
+
+def test_build_model_definitions_exposes_four_local_backends(tmp_path):
+    definitions = web_ui_script.build_model_definitions(tmp_path, 1024, 50)
+
+    assert [(item.model_id, item.label) for item in definitions] == [
+        ("0.5b", "PP-UIE-0.5B"),
+        ("1.5b", "PP-UIE-1.5B"),
+        ("uie-mini", "UIE-mini"),
+        ("uie-base", "UIE-base"),
+    ]
+    assert [item.backend_factory for item in definitions] == [
+        PPUIEBackend,
+        PPUIEBackend,
+        UIETaskflowBackend,
+        UIETaskflowBackend,
+    ]
+    assert definitions[0].config == RuntimeConfig(
+        (tmp_path / "models/PP-UIE-0.5B").resolve(),
+        "cpu",
+        "float32",
+        1,
+        1024,
+        50,
+    )
+    assert definitions[1].config.model_path == (tmp_path / "models/PP-UIE-1.5B").resolve()
+    assert definitions[2].config == UIETaskflowConfig(
+        (tmp_path / "models/UIE-mini").resolve(),
+        device="cpu",
+        batch_size=1,
+        max_seq_len=1024,
+        position_prob=0.5,
+    )
+    assert definitions[3].config == UIETaskflowConfig(
+        (tmp_path / "models/UIE-base").resolve(),
+        device="cpu",
+        batch_size=1,
+        max_seq_len=1024,
+        position_prob=0.5,
+        model="uie-base",
+    )
 
 
 def test_web_application_exposes_ready_config_and_delegates_extraction():
     class Service:
         model_name = "0.5b"
         load_ms = 1234.5
-        available_models = ["0.5b", "1.5b"]
+        available_models = [
+            {"id": "0.5b", "label": "PP-UIE-0.5B"},
+            {"id": "1.5b", "label": "PP-UIE-1.5B"},
+        ]
 
         def extract(self, text, fields, strict=True):
             return {"text": text, "fields": fields, "strict": strict}
@@ -234,7 +322,10 @@ def test_web_application_exposes_ready_config_and_delegates_extraction():
     assert app.config() == {
         "model": "0.5b",
         "load_ms": 1234.5,
-        "models": ["0.5b", "1.5b"],
+        "models": [
+            {"id": "0.5b", "label": "PP-UIE-0.5B"},
+            {"id": "1.5b", "label": "PP-UIE-1.5B"},
+        ],
         "samples": samples,
         "field_groups": FIELD_GROUPS,
     }
@@ -266,3 +357,111 @@ def test_web_application_rejects_non_boolean_strict_mode():
 def test_web_application_rejects_malformed_model_switch(payload):
     with pytest.raises(ValueError, match="JSON object with model"):
         WebApplication(object(), []).switch_model(payload)
+
+
+def test_switcher_uses_each_models_own_backend_factory(tmp_path):
+    events = []
+
+    def make_factory(kind):
+        class Backend:
+            def __init__(self, config):
+                events.append(("create", kind, config))
+
+            def load(self):
+                events.append(("load", kind))
+
+            def close(self):
+                events.append(("close", kind))
+
+        return Backend
+
+    pp_config = RuntimeConfig(tmp_path / "pp")
+    uie_config = object()
+    switcher = SwitchingExtractionService.create(
+        [
+            ModelDefinition("0.5b", "PP-UIE-0.5B", pp_config, make_factory("pp")),
+            ModelDefinition("uie-mini", "UIE-mini", uie_config, make_factory("uie")),
+        ],
+        "0.5b",
+        collect_memory=lambda: events.append(("collect",)),
+    )
+
+    switcher.switch_model("uie-mini")
+
+    assert events == [
+        ("create", "pp", pp_config),
+        ("load", "pp"),
+        ("close", "pp"),
+        ("collect",),
+        ("create", "uie", uie_config),
+        ("load", "uie"),
+    ]
+
+
+def test_failed_switch_has_no_active_model_and_can_retry(tmp_path):
+    should_fail = {"value": True}
+
+    class WorkingBackend:
+        def __init__(self, config):
+            pass
+
+        def load(self):
+            pass
+
+        def close(self):
+            pass
+
+    class RetryBackend(WorkingBackend):
+        def load(self):
+            if should_fail["value"]:
+                raise RuntimeError("load failed")
+
+    switcher = SwitchingExtractionService.create(
+        [
+            ModelDefinition("0.5b", "PP-UIE-0.5B", object(), WorkingBackend),
+            ModelDefinition("uie-mini", "UIE-mini", object(), RetryBackend),
+        ],
+        "0.5b",
+    )
+
+    with pytest.raises(RuntimeError, match="load failed"):
+        switcher.switch_model("uie-mini")
+    assert switcher.model_name is None
+    assert switcher.load_ms is None
+    with pytest.raises(RuntimeError, match="no active model"):
+        switcher.extract("ISO：800", ["感光度"])
+
+    should_fail["value"] = False
+    assert switcher.switch_model("uie-mini")["changed"] is True
+    assert switcher.model_name == "uie-mini"
+
+
+def test_available_models_exposes_ids_and_labels(tmp_path):
+    class Backend:
+        def __init__(self, config):
+            pass
+
+        def load(self):
+            pass
+
+    definitions = [
+        ModelDefinition("0.5b", "PP-UIE-0.5B", object(), Backend),
+        ModelDefinition("uie-mini", "UIE-mini", object(), Backend),
+    ]
+    switcher = SwitchingExtractionService.create(definitions, "0.5b")
+
+    assert model_options(definitions) == [
+        {"id": "0.5b", "label": "PP-UIE-0.5B"},
+        {"id": "uie-mini", "label": "UIE-mini"},
+    ]
+    assert switcher.available_models == model_options(definitions)
+
+
+def test_switcher_rejects_duplicate_model_ids():
+    definition = ModelDefinition("same", "First", object(), lambda config: None)
+
+    with pytest.raises(ValueError, match="duplicate model id: same"):
+        SwitchingExtractionService.create(
+            [definition, ModelDefinition("same", "Second", object(), lambda config: None)],
+            "same",
+        )

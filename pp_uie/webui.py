@@ -5,9 +5,9 @@ import json
 from pathlib import Path
 import threading
 import time
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Optional, Sequence
 
-from .backend import PPUIEBackend, RuntimeConfig
+from .model_registry import ModelDefinition, index_definitions, model_options
 from .strict_validation import ALLOWED_FIELDS, canonicalize_fields, validate_extraction
 
 
@@ -101,16 +101,14 @@ class ExtractionService:
     @classmethod
     def create(
         cls,
-        config: RuntimeConfig,
-        model_name: str,
-        backend_factory=PPUIEBackend,
+        definition: ModelDefinition,
         clock: Callable[[], float] = time.perf_counter,
     ) -> "ExtractionService":
         started = clock()
-        backend = backend_factory(config)
+        backend = definition.backend_factory(definition.config)
         backend.load()
         load_ms = (clock() - started) * 1000
-        return cls(backend, model_name, load_ms, clock)
+        return cls(backend, definition.model_id, load_ms, clock)
 
     def extract(self, text: str, fields: Sequence[str], strict: bool = True) -> dict[str, Any]:
         text = text.strip()
@@ -125,6 +123,9 @@ class ExtractionService:
         with self._lock:
             started = self.clock()
             self.backend.set_schema(fields)
+            prepare_schema = getattr(self.backend, "prepare_schema", None)
+            if prepare_schema is not None:
+                prepare_schema([text])
             schema_ms = (self.clock() - started) * 1000
             started = self.clock()
             raw = self.backend.extract([text])[0]
@@ -161,15 +162,14 @@ class SwitchingExtractionService:
 
     def __init__(
         self,
-        configs: dict[str, RuntimeConfig],
-        service: ExtractionService,
-        backend_factory,
+        definitions: Sequence[ModelDefinition],
+        service: Optional[ExtractionService],
         clock: Callable[[], float],
         collect_memory: Callable[[], Any],
     ):
-        self.configs = dict(configs)
+        self.definitions = tuple(definitions)
+        self._definitions_by_id = index_definitions(self.definitions)
         self._service = service
-        self.backend_factory = backend_factory
         self.clock = clock
         self.collect_memory = collect_memory
         self._lock = threading.RLock()
@@ -177,36 +177,35 @@ class SwitchingExtractionService:
     @classmethod
     def create(
         cls,
-        configs: dict[str, RuntimeConfig],
+        definitions: Sequence[ModelDefinition],
         initial_model: str,
-        backend_factory=PPUIEBackend,
         clock: Callable[[], float] = time.perf_counter,
         collect_memory: Callable[[], Any] = gc.collect,
     ) -> "SwitchingExtractionService":
-        if initial_model not in configs:
+        definitions = tuple(definitions)
+        indexed = index_definitions(definitions)
+        if initial_model not in indexed:
             raise ValueError(f"unsupported model: {initial_model}")
-        service = ExtractionService.create(
-            configs[initial_model], initial_model, backend_factory=backend_factory, clock=clock
-        )
-        return cls(configs, service, backend_factory, clock, collect_memory)
+        service = ExtractionService.create(indexed[initial_model], clock=clock)
+        return cls(definitions, service, clock, collect_memory)
 
     @property
-    def available_models(self) -> list[str]:
-        return list(self.configs)
+    def available_models(self) -> list[dict[str, str]]:
+        return model_options(self.definitions)
 
     @property
-    def model_name(self) -> str:
-        return self._service.model_name
+    def model_name(self) -> Optional[str]:
+        return self._service.model_name if self._service is not None else None
 
     @property
-    def load_ms(self) -> float:
-        return self._service.load_ms
+    def load_ms(self) -> Optional[float]:
+        return self._service.load_ms if self._service is not None else None
 
     def switch_model(self, model_name: str) -> dict[str, Any]:
-        if model_name not in self.configs:
+        if model_name not in self._definitions_by_id:
             raise ValueError(f"unsupported model: {model_name}")
         with self._lock:
-            if model_name == self._service.model_name:
+            if self._service is not None and model_name == self._service.model_name:
                 return {
                     "model": model_name,
                     "changed": False,
@@ -215,14 +214,12 @@ class SwitchingExtractionService:
                 }
             started = self.clock()
             old_service, self._service = self._service, None
-            old_service.close()
-            del old_service
-            self.collect_memory()
+            if old_service is not None:
+                old_service.close()
+                del old_service
+                self.collect_memory()
             self._service = ExtractionService.create(
-                self.configs[model_name],
-                model_name,
-                backend_factory=self.backend_factory,
-                clock=self.clock,
+                self._definitions_by_id[model_name], clock=self.clock
             )
             return {
                 "model": model_name,
@@ -233,6 +230,8 @@ class SwitchingExtractionService:
 
     def extract(self, text: str, fields: Sequence[str], strict: bool = True) -> dict[str, Any]:
         with self._lock:
+            if self._service is None:
+                raise RuntimeError("no active model")
             return self._service.extract(text, fields, strict=strict)
 
 
