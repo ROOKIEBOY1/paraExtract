@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
+import pp_uie.webui as webui
 
 from pp_uie.backend import RuntimeConfig
 from pp_uie.webui import (
@@ -19,6 +20,25 @@ def test_load_text_samples_returns_the_six_user_records():
     assert [row["id"] for row in rows] == [f"pocket_user_{index:02d}" for index in range(1, 7)]
     assert rows[0]["label"] == "测试文本 1"
     assert "焦段1.0x～1.3x" in rows[0]["text"]
+
+
+def test_load_web_samples_groups_the_original_six_and_all_40_edge_posts():
+    root = Path(__file__).parents[1]
+    assert hasattr(webui, "load_web_samples")
+    rows = webui.load_web_samples(
+        root / "testdata/pocket_user_six_samples.jsonl",
+        root / "testdata/pocket_edge_cases.jsonl",
+    )
+
+    assert len(rows) == 46
+    assert [row["id"] for row in rows[:6]] == [f"pocket_user_{index:02d}" for index in range(1, 7)]
+    assert rows[0]["label"] == "原始文本 1"
+    assert rows[0]["group"] == "原有测试文本（6条）"
+    assert rows[6]["label"] == "P0-01 · 模糊语义 · 01"
+    assert rows[6]["group"] == "P0 边界场景（30条）"
+    assert rows[36]["group"] == "P1 OCR/别名场景（6条）"
+    assert rows[42]["label"] == "MIXED · 综合场景 · 01"
+    assert rows[42]["group"] == "综合压力场景（4条）"
 
 
 def test_service_loads_model_once_and_reuses_it_for_dynamic_fields(tmp_path):
@@ -191,6 +211,9 @@ def test_web_page_contains_required_controls():
     assert "/api/model" in page
     assert "function showError" in page
     assert "errorBox.innerHTML" not in page
+    assert "function renderSampleOptions" in page
+    assert "document.createElement('optgroup')" in page
+    assert "option.textContent = row.label" in page
 
 
 def test_web_application_exposes_ready_config_and_delegates_extraction():

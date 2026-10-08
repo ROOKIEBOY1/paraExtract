@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT))
 from pp_uie.backend import RuntimeConfig
 from pp_uie.models import MODEL_SPECS, validate_model_dir
 from pp_uie.webserver import make_handler
-from pp_uie.webui import SwitchingExtractionService, WebApplication, load_text_samples
+from pp_uie.webui import SwitchingExtractionService, WebApplication, load_web_samples
 
 
 def main(argv=None) -> int:
@@ -50,7 +50,10 @@ def main(argv=None) -> int:
         configs,
         initial_model=args.model,
     )
-    samples = load_text_samples(ROOT / "testdata/pocket_user_six_samples.jsonl")
+    samples = load_web_samples(
+        ROOT / "testdata/pocket_user_six_samples.jsonl",
+        ROOT / "testdata/pocket_edge_cases.jsonl",
+    )
     application = WebApplication(service, samples)
     server = ThreadingHTTPServer(("127.0.0.1", args.port), make_handler(application, ROOT / "web/index.html"))
     url = f"http://127.0.0.1:{args.port}"

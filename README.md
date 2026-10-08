@@ -12,7 +12,7 @@
 - 提供 Web 页面选择文本、字段、模型和严格抽取模式；
 - 0.5B/1.5B 可从页面切换，切换时先释放当前模型，再加载目标模型；
 - 保留模型原始输出，同时输出标准化结果、原文证据和拒绝原因；
-- 包含 6 段人工整理的 Pocket 参数测试文本和自动化测试。
+- 包含 6 段人工整理的 Pocket 参数文本、40 条边界/噪声测试文本和自动化数据契约测试。
 
 ## 已验证环境
 
@@ -66,6 +66,7 @@ python scripts/web_ui.py --model 0.5b --port 7860 --max-length 1024
 打开 <http://127.0.0.1:7860/>。页面支持：
 
 - 选择内置测试文本或直接粘贴文本；
+- 下拉框按原有6条、P0、P1和综合压力场景分组提供全部46条测试文本；
 - 选择需要抽取的字段；
 - 切换 0.5B/1.5B；
 - 开启或关闭严格抽取模式；
@@ -123,6 +124,18 @@ python scripts/evaluate_strict_ui.py
 ```
 
 严格模式评估结论见 [`results/strict_mode_assessment.md`](results/strict_mode_assessment.md)，结构化数据见 [`results/strict_mode_evaluation.json`](results/strict_mode_evaluation.json)。
+
+### Pocket 边界测试集
+
+新增测试集以现有 6 条 Pocket 文本为母本，覆盖字段别名、缺省值、同名歧义、互斥参数、范围/候选值、非法参数、机内/后期分组以及 OCR 噪声：
+
+- 输入：[`testdata/pocket_edge_cases.jsonl`](testdata/pocket_edge_cases.jsonl)
+- 人工金标：[`testdata/pocket_edge_cases_expected.jsonl`](testdata/pocket_edge_cases_expected.jsonl)
+- 覆盖矩阵与输出规范：[`testdata/pocket_edge_cases_matrix.md`](testdata/pocket_edge_cases_matrix.md)
+
+测试文本和金标刻意分开保存。缺失字段不输出空占位；连续范围保留 `起点-终点`，离散多候选使用 `value|value`；无法消歧、互斥或非法候选不会进入标准化 `params`。
+
+40 条边界文本均按真实参数推荐帖重写：每条 Schema 覆盖 11 个字段，至少包含 7 个明确可评测参数，再叠加一个受控的歧义、缺省、冲突、非法值或 OCR 噪声场景。
 
 ## 项目结构
 

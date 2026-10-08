@@ -18,6 +18,28 @@ FIELD_GROUPS = [
     },
 ]
 
+EDGE_RULE_LABELS = {
+    "P0-01": "模糊语义",
+    "P0-02": "数值格式",
+    "P0-03": "曝光歧义",
+    "P0-04": "参数互斥",
+    "P0-05": "参数名缺省",
+    "P0-06": "参数值缺省",
+    "P0-07": "名称和值缺省",
+    "P0-08": "范围与多选",
+    "P0-09": "非法参数",
+    "P0-10": "输出格式",
+    "P1-01": "OCR噪声",
+    "P1-02": "别名与错别字",
+    "MIXED": "综合场景",
+}
+
+EDGE_GROUP_LABELS = {
+    "P0": "P0 边界场景（30条）",
+    "P1": "P1 OCR/别名场景（6条）",
+    "MIXED": "综合压力场景（4条）",
+}
+
 
 def load_text_samples(path: Path) -> list[dict[str, str]]:
     rows = []
@@ -27,6 +49,32 @@ def load_text_samples(path: Path) -> list[dict[str, str]]:
         row = json.loads(line)
         rows.append({"id": row["id"], "label": f"测试文本 {index}", "text": row["text"]})
     return rows
+
+
+def load_web_samples(original_path: Path, edge_path: Path) -> list[dict[str, str]]:
+    samples = []
+    for index, row in enumerate(load_text_samples(original_path), start=1):
+        samples.append({
+            **row,
+            "label": f"原始文本 {index}",
+            "group": "原有测试文本（6条）",
+        })
+
+    rule_counts: dict[str, int] = {}
+    for line in edge_path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        rule = row["primary_rule"]
+        priority = row["priority"]
+        rule_counts[rule] = rule_counts.get(rule, 0) + 1
+        samples.append({
+            "id": row["id"],
+            "label": f"{rule} · {EDGE_RULE_LABELS[rule]} · {rule_counts[rule]:02d}",
+            "text": row["text"],
+            "group": EDGE_GROUP_LABELS[priority],
+        })
+    return samples
 
 
 def normalize_flat_output(raw: dict[str, Any], fields: Sequence[str]) -> dict[str, list[str]]:

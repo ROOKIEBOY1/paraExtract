@@ -114,13 +114,36 @@
     errorBox.appendChild(box);
   }
 
+  function renderSampleOptions(samples) {
+    sampleSelect.replaceChildren();
+    const custom = document.createElement('option');
+    custom.value = 'custom'; custom.textContent = '自定义文本';
+    sampleSelect.appendChild(custom);
+    const groups = new Map();
+    samples.forEach((row, index) => {
+      let parent = sampleSelect;
+      if (row.group) {
+        if (!groups.has(row.group)) {
+          const optionGroup = document.createElement('optgroup');
+          optionGroup.label = row.group;
+          groups.set(row.group, optionGroup);
+          sampleSelect.appendChild(optionGroup);
+        }
+        parent = groups.get(row.group);
+      }
+      const option = document.createElement('option');
+      option.value = String(index); option.textContent = row.label;
+      parent.appendChild(option);
+    });
+  }
+
   async function initialize() {
     const response = await fetch('/api/config');
     config = await response.json();
     document.getElementById('model-status').textContent = `${config.model} 已加载 · ${formatMs(config.load_ms)}`;
     modelSelect.innerHTML = config.models.map(model => `<option value="${model}">PP-UIE-${model.toUpperCase()}</option>`).join('');
     modelSelect.value = config.model; modelSelect.disabled = false;
-    sampleSelect.innerHTML = '<option value="custom">自定义文本</option>' + config.samples.map((row, i) => `<option value="${i}">${row.label}</option>`).join('');
+    renderSampleOptions(config.samples);
     config.field_groups.forEach((group, groupIndex) => {
       const container = document.createElement('div'); container.className = 'group'; container.dataset.group = groupIndex;
       container.innerHTML = `<div class="group-name">${group.name}</div><div class="checks">${group.fields.map(field => `<label class="chip"><input type="checkbox" name="field" value="${field}"><span>${field}</span></label>`).join('')}</div>`;
