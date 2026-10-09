@@ -1,4 +1,4 @@
-from pp_uie.normalize import normalize_scene_output
+from text_extractor.core.normalize import normalize_scene_output
 
 
 def test_similar_concert_scenes_remain_separate():
@@ -17,4 +17,3 @@ def test_normalization_preserves_raw_text_verbatim():
     raw = {"拍照公式场景": [{"text": "暗调氛围感", "relations": {"去噪": [{"text": "-0.1"}]}}]}
     result = normalize_scene_output(raw, {"拍照公式场景": ["去噪"]})
     assert result["scenes"][0]["parameters"]["去噪"] == ["-0.1"]
-

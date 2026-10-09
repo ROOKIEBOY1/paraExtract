@@ -1,4 +1,4 @@
-from pp_uie.experiments import run_schema_switches
+from text_extractor.evaluation.experiments import run_schema_switches
 
 
 def test_schema_switches_measure_set_and_inference_without_loading():

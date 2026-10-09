@@ -1,6 +1,6 @@
 import pytest
 
-from pp_uie.cli import batched, parse_args, resolve_runtime
+from text_extractor.runtime.cli import batched, parse_args, resolve_runtime
 
 
 @pytest.mark.parametrize("argv", [

@@ -1,6 +1,6 @@
 import pytest
 
-from pp_uie.strict_validation import (
+from text_extractor.validation.strict import (
     ALLOWED_FIELDS,
     canonicalize_fields,
     validate_extraction,

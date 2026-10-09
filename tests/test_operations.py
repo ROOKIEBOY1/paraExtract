@@ -1,6 +1,6 @@
 import json
 
-from pp_uie.operations import OperationLog
+from text_extractor.core.operations import OperationLog
 
 
 def test_operation_log_writes_reproducible_jsonl(tmp_path):
@@ -15,4 +15,3 @@ def test_operation_log_writes_reproducible_jsonl(tmp_path):
         "started_at": "start",
         "ended_at": "end",
     }
-

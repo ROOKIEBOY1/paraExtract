@@ -14,6 +14,23 @@
 - 保留模型原始输出，同时输出标准化结果、原文证据和拒绝原因；
 - 包含 6 段人工整理的 Pocket 参数文本、40 条边界/噪声测试文本和自动化数据契约测试。
 
+## 模型架构
+
+项目使用统一的 `text_extractor` Python 包，但将两类模型实现保持独立：
+
+- `text_extractor.backends.pp_uie`：PP-UIE-0.5B/1.5B 生成式后端，负责提示词构造、生成结果解析以及对应权重的下载和校验；
+- `text_extractor.backends.uie`：UIE-mini/base 跨度抽取后端，负责 Taskflow 推理、原文偏移和动态 Schema 别名，以及对应权重的下载和校验；
+- `text_extractor.core`、`validation`、`evaluation`、`runtime` 和 `web`：两类模型共同使用的 Schema、严格校验、评测、运行时与页面服务。
+
+开发者可以从各自后端导入模型接口：
+
+```python
+from text_extractor.backends.pp_uie import PPUIEBackend, RuntimeConfig
+from text_extractor.backends.uie import UIETaskflowBackend, UIETaskflowConfig
+```
+
+两个后端不会互相导入或加载；页面切换模型时，内存中仍只保留当前选择的一个模型。
+
 ## 已验证环境
 
 | 组件 | 版本/配置 |
@@ -153,7 +170,7 @@ python scripts/infer.py \
 | `numeric_sign_mismatch` | 模型遗漏了原文中的正负号 |
 | `span_offset_mismatch` | UIE span 的 `start/end` 与原文切片不一致 |
 
-当前严格字段目录和英文别名定义在 [`pp_uie/strict_validation.py`](pp_uie/strict_validation.py)。UIE-mini/UIE-base 每次抽取前会检查原文：只有原文实际出现 `ISO`、`White Balance`、`Sharpness` 等已登记英文标签时，才在本次 Taskflow Schema 中追加对应的“别名值”查询；模型输出随后合并回标准中文字段。原文不会被翻译或改写，因此 `start`、`end` 和证据片段仍对应用户提交的原始文本。未命中的别名不会加入 Schema，PP-UIE-0.5B/1.5B 的生成式推理路径也不受影响。新增字段时只需在字段配置中登记别名，无需修改这段调度逻辑；别名查询会增加本次 UIE 的查询项，英文标签较多时推理耗时可能相应上升。
+当前严格字段目录和英文别名定义在 [`text_extractor/validation/strict.py`](text_extractor/validation/strict.py)。UIE-mini/UIE-base 每次抽取前会检查原文：只有原文实际出现 `ISO`、`White Balance`、`Sharpness` 等已登记英文标签时，才在本次 Taskflow Schema 中追加对应的“别名值”查询；模型输出随后合并回标准中文字段。原文不会被翻译或改写，因此 `start`、`end` 和证据片段仍对应用户提交的原始文本。未命中的别名不会加入 Schema，PP-UIE-0.5B/1.5B 的生成式推理路径也不受影响。新增字段时只需在字段配置中登记别名，无需修改这段调度逻辑；别名查询会增加本次 UIE 的查询项，英文标签较多时推理耗时可能相应上升。
 
 ## 测试与评估
 
@@ -230,7 +247,15 @@ UIE-base 页面端到端验收中，新进程加载后的 RSS 为 1,492,960 KiB�
 ```text
 .
 ├── configs/                 # Schema 配置
-├── pp_uie/                  # 模型后端、校验、指标和服务逻辑
+├── text_extractor/          # 统一的文本抽取 Python 包
+│   ├── backends/
+│   │   ├── pp_uie/          # PP-UIE-0.5B/1.5B 生成式后端与模型管理
+│   │   └── uie/             # UIE-mini/base 跨度后端与模型管理
+│   ├── core/                # Schema、注册表、标准化和操作日志
+│   ├── validation/          # 证据、字段类型和值域校验
+│   ├── evaluation/          # 指标、基准测试和资源监控
+│   ├── runtime/             # CLI、环境检查和离线控制
+│   └── web/                 # 常驻模型服务与本地 HTTP 接口
 ├── scripts/                 # 环境检查、下载、推理、评估和 Web 入口
 ├── testdata/                # 人工转录文本、期望结果和噪声样例
 ├── tests/                   # 自动化测试
@@ -239,6 +264,8 @@ UIE-base 页面端到端验收中，新进程加载后的 RSS 为 1,492,960 KiB�
 ├── requirements.txt
 └── README.md
 ```
+
+旧的 `pp_uie` Python 包已经移除，不提供双路径兼容层。外部运行命令、模型 ID、`models/` 下的权重位置、Web API 和结果格式保持不变；仅开发者代码中的 Python 导入路径迁移到 `text_extractor.*`。
 
 ## 已知限制
 

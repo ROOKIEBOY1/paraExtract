@@ -9,7 +9,11 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from pp_uie.environment import ProbeResult, collect_environment, render_environment_markdown
+from text_extractor.runtime.environment import (
+    ProbeResult,
+    collect_environment,
+    render_environment_markdown,
+)
 
 
 def run(command: list[str]) -> ProbeResult:
@@ -31,4 +35,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -8,7 +8,7 @@ from scripts.evaluate_uie_mini import (
     resolve_output_paths,
     summarize_results,
 )
-from pp_uie.uie_backend import UIETaskflowBackend, UIETaskflowConfig
+from text_extractor.backends.uie import UIETaskflowBackend, UIETaskflowConfig
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]

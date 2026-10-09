@@ -12,11 +12,15 @@ from typing import Any, Optional, Sequence
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pp_uie.model_registry import ModelDefinition
-from pp_uie.strict_validation import ALLOWED_FIELDS
-from pp_uie.uie_backend import UIETaskflowBackend, UIETaskflowConfig
-from pp_uie.uie_models import UIE_MODEL_SPECS, validate_uie_model_dir
-from pp_uie.webui import ExtractionService
+from text_extractor.backends.uie import (
+    UIETaskflowBackend,
+    UIETaskflowConfig,
+    UIE_MODEL_SPECS,
+    validate_uie_model_dir,
+)
+from text_extractor.core.registry import ModelDefinition
+from text_extractor.validation.strict import ALLOWED_FIELDS
+from text_extractor.web.application import ExtractionService
 
 
 def _read_jsonl(path: Path) -> list[dict[str, Any]]:

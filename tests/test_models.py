@@ -2,7 +2,8 @@ import json
 
 import pytest
 
-from pp_uie.models import _download_file, validate_model_dir
+from text_extractor.backends.pp_uie import validate_model_dir
+from text_extractor.backends.pp_uie.models import _download_file
 
 
 def _base_files(path):

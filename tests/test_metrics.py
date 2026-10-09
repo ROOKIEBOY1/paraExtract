@@ -1,4 +1,4 @@
-from pp_uie.metrics import evaluate_records, normalize_value
+from text_extractor.evaluation.metrics import evaluate_records, normalize_value
 
 
 def test_strict_and_normalized_metrics_are_separate():

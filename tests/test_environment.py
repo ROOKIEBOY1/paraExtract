@@ -1,4 +1,4 @@
-from pp_uie.environment import ProbeResult, collect_environment, render_environment_markdown
+from text_extractor.runtime.environment import ProbeResult, collect_environment, render_environment_markdown
 
 
 def test_environment_report_distinguishes_absent_accelerators():

@@ -1,4 +1,10 @@
-from pp_uie.backend import GenerationEngine, PaddleGenerationEngine, PPUIEBackend, RuntimeConfig, _parse_answer
+from text_extractor.backends.pp_uie import (
+    GenerationEngine,
+    PaddleGenerationEngine,
+    PPUIEBackend,
+    RuntimeConfig,
+)
+from text_extractor.backends.pp_uie.backend import _parse_answer
 
 
 class FixtureEngine(GenerationEngine):

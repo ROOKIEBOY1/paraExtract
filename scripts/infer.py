@@ -9,8 +9,8 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pp_uie.cli import batched, parse_args, resolve_runtime
-from pp_uie.offline import block_network
+from text_extractor.runtime.cli import batched, parse_args, resolve_runtime
+from text_extractor.runtime.offline import block_network
 
 
 def _inputs(args):
@@ -23,9 +23,13 @@ def main(argv=None) -> int:
     args = parse_args(argv)
     if args.offline:
         block_network()
-    from pp_uie.backend import PPUIEBackend, RuntimeConfig
-    from pp_uie.models import MODEL_SPECS, validate_model_dir
-    from pp_uie.normalize import normalize_scene_output
+    from text_extractor.backends.pp_uie import (
+        MODEL_SPECS,
+        PPUIEBackend,
+        RuntimeConfig,
+        validate_model_dir,
+    )
+    from text_extractor.core.normalize import normalize_scene_output
 
     device, precision = resolve_runtime(args.device, args.precision)
     model_path = (args.model_path or ROOT / "models" / MODEL_SPECS[args.model].directory).resolve()

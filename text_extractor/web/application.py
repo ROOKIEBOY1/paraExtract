@@ -7,8 +7,8 @@ import threading
 import time
 from typing import Any, Callable, Optional, Sequence
 
-from .model_registry import ModelDefinition, index_definitions, model_options
-from .strict_validation import ALLOWED_FIELDS, canonicalize_fields, validate_extraction
+from ..core.registry import ModelDefinition, index_definitions, model_options
+from ..validation.strict import ALLOWED_FIELDS, canonicalize_fields, validate_extraction
 
 
 FIELD_GROUPS = [

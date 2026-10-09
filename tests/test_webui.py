@@ -2,13 +2,13 @@ import json
 from pathlib import Path
 
 import pytest
-import pp_uie.webui as webui
+import text_extractor.web.application as webui
 import scripts.web_ui as web_ui_script
 
-from pp_uie.backend import PPUIEBackend, RuntimeConfig
-from pp_uie.model_registry import ModelDefinition, model_options
-from pp_uie.uie_backend import UIETaskflowBackend, UIETaskflowConfig
-from pp_uie.webui import (
+from text_extractor.backends.pp_uie import PPUIEBackend, RuntimeConfig
+from text_extractor.backends.uie import UIETaskflowBackend, UIETaskflowConfig
+from text_extractor.core.registry import ModelDefinition, model_options
+from text_extractor.web.application import (
     ExtractionService,
     FIELD_GROUPS,
     SwitchingExtractionService,

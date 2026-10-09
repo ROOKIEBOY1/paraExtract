@@ -10,8 +10,14 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from pp_uie.models import MODEL_FILES, MODEL_SPECS, download_model, manifest_as_dict, validate_model_dir
-from pp_uie.uie_models import (
+from text_extractor.backends.pp_uie import (
+    MODEL_FILES,
+    MODEL_SPECS,
+    download_model,
+    manifest_as_dict,
+    validate_model_dir,
+)
+from text_extractor.backends.uie import (
     UIE_MODEL_SPECS,
     download_uie_model,
     validate_uie_model_dir,

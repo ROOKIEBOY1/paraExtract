@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 from typing import Any, Callable, Optional, Sequence
 
-from .strict_validation import EN_TO_CN
+from ...validation.strict import EN_TO_CN
 
 
 @dataclass(frozen=True)

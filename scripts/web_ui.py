@@ -13,13 +13,25 @@ import webbrowser
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pp_uie.backend import PPUIEBackend, RuntimeConfig
-from pp_uie.model_registry import ModelDefinition, index_definitions
-from pp_uie.models import MODEL_SPECS, validate_model_dir
-from pp_uie.uie_backend import UIETaskflowBackend, UIETaskflowConfig
-from pp_uie.uie_models import UIE_MODEL_SPECS, validate_uie_model_dir
-from pp_uie.webserver import make_handler
-from pp_uie.webui import SwitchingExtractionService, WebApplication, load_web_samples
+from text_extractor.backends.pp_uie import (
+    MODEL_SPECS,
+    PPUIEBackend,
+    RuntimeConfig,
+    validate_model_dir,
+)
+from text_extractor.backends.uie import (
+    UIE_MODEL_SPECS,
+    UIETaskflowBackend,
+    UIETaskflowConfig,
+    validate_uie_model_dir,
+)
+from text_extractor.core.registry import ModelDefinition, index_definitions
+from text_extractor.web.application import (
+    SwitchingExtractionService,
+    WebApplication,
+    load_web_samples,
+)
+from text_extractor.web.server import make_handler
 
 
 def build_model_definitions(

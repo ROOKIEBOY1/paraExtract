@@ -10,9 +10,9 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pp_uie.backend import PPUIEBackend, RuntimeConfig
-from pp_uie.benchmarking import run_latency_matrix
-from pp_uie.monitoring import PeakRSSMonitor
+from text_extractor.backends.pp_uie import PPUIEBackend, RuntimeConfig
+from text_extractor.evaluation.benchmarking import run_latency_matrix
+from text_extractor.evaluation.monitoring import PeakRSSMonitor
 
 
 def main() -> int:

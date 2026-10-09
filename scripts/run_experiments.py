@@ -11,13 +11,17 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pp_uie.backend import PPUIEBackend, RuntimeConfig
-from pp_uie.experiments import run_schema_switches
-from pp_uie.metrics import evaluate_records
-from pp_uie.models import MODEL_SPECS, validate_model_dir
-from pp_uie.monitoring import PeakRSSMonitor
-from pp_uie.normalize import normalize_scene_output
-from pp_uie.offline import block_network
+from text_extractor.backends.pp_uie import (
+    MODEL_SPECS,
+    PPUIEBackend,
+    RuntimeConfig,
+    validate_model_dir,
+)
+from text_extractor.core.normalize import normalize_scene_output
+from text_extractor.evaluation.experiments import run_schema_switches
+from text_extractor.evaluation.metrics import evaluate_records
+from text_extractor.evaluation.monitoring import PeakRSSMonitor
+from text_extractor.runtime.offline import block_network
 
 
 def read_jsonl(path):

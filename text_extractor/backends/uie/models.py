@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .models import ValidationReport, _download_file, _sha256
+from ...core.model_files import ValidationReport, _download_file, _sha256
 
 
 UIE_MINI_DIRECTORY = "UIE-mini"

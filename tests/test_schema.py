@@ -1,6 +1,6 @@
 import pytest
 
-from pp_uie.schema import iter_prompts, parse_schema
+from text_extractor.core.schema import iter_prompts, parse_schema
 
 
 def test_nested_scene_schema_generates_parent_prefixed_prompts():
@@ -12,4 +12,3 @@ def test_nested_scene_schema_generates_parent_prefixed_prompts():
 def test_invalid_schema_reports_json_path():
     with pytest.raises(TypeError, match=r"\$\.拍照公式场景 must be string or list"):
         parse_schema({"拍照公式场景": {"曝光": 3}})
-

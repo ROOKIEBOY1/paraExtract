@@ -1,4 +1,4 @@
-from pp_uie.benchmarking import build_length_text, run_latency_matrix
+from text_extractor.evaluation.benchmarking import build_length_text, run_latency_matrix
 
 
 def test_build_length_text_repeats_source_to_requested_character_count():

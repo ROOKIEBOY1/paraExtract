@@ -6,13 +6,15 @@ import sys
 
 import pytest
 
-import pp_uie.uie_models as uie_models
-from pp_uie.uie_models import (
-    UIE_MINI_FILES,
+import text_extractor.backends.uie.models as uie_models
+from text_extractor.backends.uie import (
     UIE_MODEL_SPECS,
-    UIEModelSpec,
     download_uie_mini,
     validate_uie_model_dir,
+)
+from text_extractor.backends.uie.models import (
+    UIE_MINI_FILES,
+    UIEModelSpec,
 )
 
 

@@ -3,7 +3,7 @@ import hashlib
 
 import pytest
 
-from pp_uie.uie_backend import UIETaskflowBackend, UIETaskflowConfig
+from text_extractor.backends.uie import UIETaskflowBackend, UIETaskflowConfig
 
 
 class FakeTaskflow:

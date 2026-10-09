@@ -1,4 +1,4 @@
-from pp_uie.monitoring import process_tree_rss, summarize_latencies
+from text_extractor.evaluation.monitoring import process_tree_rss, summarize_latencies
 
 
 def test_latency_percentiles_use_nearest_rank():

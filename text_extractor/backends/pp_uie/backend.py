@@ -7,7 +7,7 @@ from pathlib import Path
 import re
 from typing import Any, Callable, Sequence
 
-from .schema import SchemaNode, parse_schema
+from ...core.schema import SchemaNode, parse_schema
 
 
 LLM_IE_PROMPT = """你是一个阅读理解专家，请提取所给句子与问题，提取实体。请注意，如果存在实体，则一定在原句中逐字出现，请输出对应实体的原文，不要进行额外修改；如果无法提取，请输出“无相应实体”。

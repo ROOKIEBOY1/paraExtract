@@ -5,7 +5,7 @@ from urllib.request import Request, urlopen
 
 import pytest
 
-from pp_uie.webserver import make_handler
+from text_extractor.web.server import make_handler
 
 
 def test_http_server_serves_page_config_and_extraction(tmp_path):
